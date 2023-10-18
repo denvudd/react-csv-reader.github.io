@@ -1,6 +1,6 @@
 # React CSV Parser & Reader
 
-![alt text](./public/screenshot/preview.png)
+![alt text](./public/preview.png)
 
 Stack: React, Tailwind CSS, Papaparse
 
