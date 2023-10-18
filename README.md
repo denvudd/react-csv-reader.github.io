@@ -1,43 +1,34 @@
-# Getting Started with Create React App
+# React CSV Parser & Reader
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![alt text](./public/screenshot/preview.png)
 
-## Available Scripts
+Stack: React, Tailwind CSS, Papaparse
 
-In the project directory, you can run:
+This project represents a CSVReader component, which takes a CSV file of a specific type, validates the table data, and parses it into a table.
 
-### `npm start`
+For each error, you can see a detailed object of the following type:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```typescript
+name: string
+row: string
+id: string
+duplicateId?: number
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Validation rules:
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- Data can have spaces before or after the text, so it should be ignored.
+- Email and Phone must be unique within the file. AlexCho@cho.com is the same as alexCHO@CHO.coM. The Duplicate with column should list the ID of the first found row that - duplicates the email/phone of the current row.
+- Age must be of type integer and not less than 21.
+- Experience must be greater than or equal to 0 (and less than or equal to the current Age - 21).
+- Yearly income can be of type integer or decimal but should always be displayed with two decimal places. It should not exceed 1 million.
+- All numerical values must be >= 0 (depending on the field, age cannot be 0).
+- License states can be in the form of abbreviations or have full names (e.g., AL, Alabama). However, only the short format should be displayed. There can be multiple values - separated by a vertical bar |.
+- Expiration date can be accepted in two formats (YYYY-MM-DD or MM/DD/YYYY). Anything else is an error. It cannot be earlier than the current date.
+- Phone must be displayed in the format +1xxxxxxxxxx (ten digits after +1). However, it can be imported in the formats: +1xxxxxxxxxx, 1xxxxxxxxxx, xxxxxxxxxx.
+- Has children is accepted as TRUE/FALSE values. An empty cell is accepted as FALSE. Anything else is an error.
+- License number should consist of 6 characters, which can be numbers or text characters.
+- Full Name / Phone / Email are mandatory fields. If any of them are missing, a message indicating that the file is not valid should be displayed instead of the table. The same message should be displayed if the file format is not CSV. If the header name has a different case, such as "full Name," the field is considered valid.
 
 ## Learn More
 
