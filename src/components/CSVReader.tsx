@@ -37,8 +37,8 @@ const CSVReader: React.FC = () => {
   const [isInvalidFormat, setIsInvalidFormat] = React.useState(false);
   const [isLogOpen, setIsLogOpen] = React.useState(false);
 
-  const validateCSV = React.useCallback((results: any) => {
-    const value: ValuesType = results;
+  const validateCSV = (results: any) => {
+    const value: ValuesType = results.slice(1);
     const headers: HeadersType = results[0];
 
     if (
@@ -48,6 +48,8 @@ const CSVReader: React.FC = () => {
     ) {
       setIsInvalidFormat(true);
     }
+
+    console.log(value);
 
     const validationResult: ErrorArray = [];
 
@@ -76,9 +78,12 @@ const CSVReader: React.FC = () => {
         idRow
       );
 
+      console.log("Validated Email: ", validatedEmail);
+      console.log("Duplicate: ", duplicate);
+
       if (validatedEmail) {
         if (validatedEmail.duplicateId) {
-          row[duplicate] = validatedEmail.duplicateId;
+          row[HeadersEnum.DuplicateWith] = validatedEmail.duplicateId;
         }
 
         validationResult.push(validatedEmail);
@@ -86,7 +91,7 @@ const CSVReader: React.FC = () => {
 
       if (validatedPhone) {
         if (validatedPhone.duplicateId) {
-          row[duplicate] = validatedPhone.duplicateId;
+          row[HeadersEnum.DuplicateWith] = validatedPhone.duplicateId;
         }
 
         validationResult.push(validatedPhone);
@@ -114,26 +119,23 @@ const CSVReader: React.FC = () => {
     });
 
     setColumns(headers);
-    setValues(value.slice(1));
+    setValues(value);
 
     return validationResult;
+  };
+
+  const onUploadAccepted = React.useCallback((results: any) => {
+    const value: string[][] = results.data;
+    const filtered: ValuesType = value.slice(1).map((row, index) => {
+      return [index + 1, ...row, ""];
+    });
+
+    const validationResult = validateCSV([
+      ["ID", ...value[0], "Duplicate with"],
+      ...filtered,
+    ]);
+    setErrors(validationResult);
   }, []);
-
-  const onUploadAccepted = React.useCallback(
-    (results: any) => {
-      const value: string[][] = results.data;
-      const filtered: ValuesType = value.slice(1).map((row, index) => {
-        return [index + 1, ...row];
-      });
-
-      const validationResult = validateCSV([
-        ["ID", ...value[0], "Duplicate with"],
-        ...filtered,
-      ]);
-      setErrors(validationResult);
-    },
-    [validateCSV]
-  );
 
   const handleOpenLog = React.useCallback(() => {
     setIsLogOpen(true);
@@ -191,9 +193,13 @@ const CSVReader: React.FC = () => {
                   {errors && isLogOpen && (
                     <p className="w-full font-medium">
                       Errors Log:
-                      <pre className="inline-block w-full text-sm bg-slate-200 rounded-md px-2 py-1">
-                        {JSON.stringify(errors.flat(), null, 2)}
-                      </pre>
+                      <div className="flex flex-col gap-2 mt-2">
+                        {errors.map((error, index) => (
+                          <pre className="inline-block w-full text-sm bg-slate-200 rounded-md px-2 py-1">
+                            Error on row {index + 1}: {error.name}
+                          </pre>
+                        ))}
+                      </div>
                     </p>
                   )}
                   {errors && (
